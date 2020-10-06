@@ -29,7 +29,7 @@ def parse_mulliken(dim_dict):
     val = np.zeros((n_kpt,n_state))
     tmp = np.zeros((n_kpt,n_state))
     is_org = np.zeros((n_kpt,n_state),dtype=np.int8)
-    is_occ = np.zeros((n_kpt,n_state),dtype=np.int8)
+    max_occ = np.zeros((n_kpt),dtype=int)
 
     with open("Mulliken.out","r") as f:
         for line in f:
@@ -58,11 +58,11 @@ def parse_mulliken(dim_dict):
                         val[i_kpt,int(t[0])-i_min] = float(t[1])
 
                         if float(t[2]) >= 0.5:
-                            is_occ[i_kpt,int(t[0])-i_min] = 1
+                            max_occ[i_kpt] = int(t[0])-i_min
 
     for i_kpt in range(n_kpt):
         for i_state in range(n_state):
             if tmp[i_kpt,i_state] > 0.8:
                 is_org[i_kpt,i_state] = 1
 
-    return is_org,is_occ,val,kwt
+    return val,max_occ,is_org,kwt
