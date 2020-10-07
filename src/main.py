@@ -1,60 +1,64 @@
 #!/usr/bin/env python3
 
-import sys
 import numpy as np
 from dimension import find_dim
 from mulliken import parse_mulliken
 from smear import gauss
 from read_elsi import read_elsi_to_den
-from plot import plot_all
+from plot import plot_data
 
 dim_dict = find_dim()
 n_ks = dim_dict["i_max"]-dim_dict["i_min"]+1
 
-print("Parsing Mulliken.out")
+print("Parsing Mulliken.out",flush=True)
 
 state_val,max_occ,state_is_org,kwt = parse_mulliken(dim_dict)
 
 wid = 0.1
-nw = 2000
-dw = 0.005
-w0 = 0.001
+nw = 1000
+dw = 0.01
+w0 = 0.01
 w1 = w0+(nw-1)*dw
 xw = np.linspace(w0,w1,num=nw)
-yw = np.zeros((nw,4))
 
-#for i_kpt in range(dim_dict["n_kpt"]):
-for i_kpt in range(1):
-    filename = "moment_soc_x_kpt_"+"{:06}".format(i_kpt+1)+".csc"
+for i_dir in ["x","y","z"]:
+    yw = np.zeros((nw,4))
 
-    print("Processing file "+filename)
+    for i_kpt in range(dim_dict["n_kpt"]):
+        filename = "moment_soc_"+i_dir+"_kpt_"+"{:06}".format(i_kpt+1)+".csc"
 
-    mommat = read_elsi_to_den(filename)
+        print("Processing file "+filename,flush=True)
 
-    de = []
-    m2 = []
-    tt = []
-    w = w0
+        mommat = read_elsi_to_den(filename)
 
-    for i1 in range(max_occ[i_kpt]):
-        for i2 in range(max_occ[i_kpt],n_ks):
-            if state_is_org[i_kpt,i1] and state_is_org[i_kpt,i2]:
-                t123 = 0
-            elif not (state_is_org[i_kpt,i1]) and (not state_is_org[i_kpt,i2]):
-                t123 = 2
-            else:
-                t123 = 1
+        de = [[],[],[]]
+        m2 = [[],[],[]]
+        w = w0-dw
 
-            mm = abs(mommat[i1,i2])
-            m2.append(mm*mm)
-            de.append(state_val[i_kpt,i2]-state_val[i_kpt,i1])
-            tt.append(t123)
+        for i1 in range(max_occ[i_kpt]):
+            for i2 in range(max_occ[i_kpt],n_ks):
+                tmp = state_val[i_kpt,i2]-state_val[i_kpt,i1]
 
-    for iw in range(nw):
-        for i1 in range(len(de)):
-            yw[iw,tt[i1]] += kwt[i_kpt]*gauss(w,de[i1],wid)*m2[i1]
-            yw[iw,3] += kwt[i_kpt]*gauss(w,de[i1],wid)*m2[i1]
+                if tmp < w1+5.0:
+                    mm = abs(mommat[i1,i2])
 
-        w += dw
+                    if state_is_org[i_kpt,i1] and state_is_org[i_kpt,i2]:
+                        m2[0].append(mm*mm)
+                        de[0].append(tmp)
+                    elif state_is_org[i_kpt,i1] or state_is_org[i_kpt,i2]:
+                        m2[1].append(mm*mm)
+                        de[1].append(tmp)
+                    else:
+                        m2[2].append(mm*mm)
+                        de[2].append(tmp)
 
-plot_all(xw,yw)
+        for iw in range(nw):
+            w += dw
+
+            for i1 in range(3):
+                yw[iw,i1] = sum([gauss(w,de[i1][i2],wid)*m2[i1][i2] for i2 in range(len(de[i1]))])
+                yw[iw,i1] *= kwt[i_kpt]
+
+        yw[:,3] = [sum(yw[iw,:3]) for iw in range(nw)]
+
+    plot_data(i_dir,xw,yw)

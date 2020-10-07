@@ -5,11 +5,11 @@ def find_dim():
 
     with open("aims.out","r") as f:
         for line in f:
-            if line.find("Number of atoms") != -1:
+            if line.find("| Number of atoms") != -1:
                 t = line.split()
                 dim_dict["n_atom"] = int(t[5])
 
-            if line.find("Number of k-points") != -1:
+            if line.find("| Number of k-points") != -1:
                 t = line.split()
                 dim_dict["n_kpt"] = int(t[5])
 
