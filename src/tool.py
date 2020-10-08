@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 def find_dim():
     dim_dict = {}
@@ -22,3 +23,24 @@ def find_dim():
                 dim_dict["i_max"] = int(t[10])
 
     return dim_dict
+
+def gauss(x,mu,sigma):
+#    pre = 1.0/(sigma*np.sqrt(2*np.pi))
+    tmp = (x-mu)/sigma
+    tmp = -0.5*tmp*tmp
+
+    return np.exp(tmp)
+
+def save_and_plot(i_dir,x,y):
+    with open("decomp_"+i_dir+".dat","w") as f:
+        for i in range(len(x)):
+            f.write(("{:12.6f}"*5).format(x[i],y[i,0],y[i,1],y[i,2],y[i,3])+"\n")
+
+    plt.plot(x,y[:,0],"r-",label="org-org")
+    plt.plot(x,y[:,1],"b-",label="org-inorg")
+    plt.plot(x,y[:,2],"y-",label="inorg-inorg")
+    plt.plot(x,y[:,3],"k--",label="all")
+    plt.xlim(0.0,np.ceil(x[-1]))
+    plt.legend()
+    plt.savefig("decomp_"+i_dir+".png",dpi=300)
+    plt.clf()

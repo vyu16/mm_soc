@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
 import numpy as np
-from dimension import find_dim
 from mulliken import parse_mulliken
-from smear import gauss
+from tool import find_dim,gauss,save_and_plot
 from read_elsi import read_elsi_to_den
-from plot import plot_data
 
 dim_dict = find_dim()
 n_ks = dim_dict["i_max"]-dim_dict["i_min"]+1
@@ -61,4 +59,4 @@ for i_dir in ["x","y","z"]:
 
         yw[:,3] = [sum(yw[iw,:3]) for iw in range(nw)]
 
-    plot_data(i_dir,xw,yw)
+    save_and_plot(i_dir,xw,yw)
