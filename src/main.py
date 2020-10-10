@@ -10,7 +10,7 @@ n_ks = dim_dict["i_max"]-dim_dict["i_min"]+1
 
 print("Parsing Mulliken.out",flush=True)
 
-state_val,max_occ,state_is_org,kwt = parse_mulliken(dim_dict)
+state_val,n_occ,state_is_org,kwt = parse_mulliken(dim_dict)
 
 wid = 0.1
 nw = 1000
@@ -33,8 +33,8 @@ for i_dir in ["x","y","z"]:
         m2 = [[],[],[]]
         w = w0-dw
 
-        for i1 in range(max_occ[i_kpt]):
-            for i2 in range(max_occ[i_kpt],n_ks):
+        for i1 in range(n_occ[i_kpt]):
+            for i2 in range(n_occ[i_kpt],n_ks):
                 tmp = state_val[i_kpt,i2]-state_val[i_kpt,i1]
 
                 if tmp < w1+wid*10:
