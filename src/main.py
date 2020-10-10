@@ -37,25 +37,30 @@ for i_dir in ["x","y","z"]:
             for i2 in range(max_occ[i_kpt],n_ks):
                 tmp = state_val[i_kpt,i2]-state_val[i_kpt,i1]
 
-                if tmp < w1+5.0:
+                if tmp < w1+wid*10:
                     mm = abs(mommat[i1,i2])
 
                     if state_is_org[i_kpt,i1] and state_is_org[i_kpt,i2]:
-                        m2[0].append(mm*mm)
                         de[0].append(tmp)
+                        m2[0].append((mm/tmp)**2)
                     elif state_is_org[i_kpt,i1] or state_is_org[i_kpt,i2]:
-                        m2[1].append(mm*mm)
                         de[1].append(tmp)
+                        m2[1].append((mm/tmp)**2)
                     else:
-                        m2[2].append(mm*mm)
                         de[2].append(tmp)
+                        m2[2].append((mm/tmp)**2)
 
         for iw in range(nw):
             w += dw
 
             for i1 in range(3):
-                yw[iw,i1] = sum([gauss(w,de[i1][i2],wid)*m2[i1][i2] for i2 in range(len(de[i1]))])
-                yw[iw,i1] *= kwt[i_kpt]
+                tmp = 0.0
+
+                for i2 in range(len(de[i1])):
+                    if abs(w-de[i1][i2]) < wid*10:
+                        tmp += gauss(w,de[i1][i2],wid)*m2[i1][i2]
+
+                yw[iw,i1] += tmp*kwt[i_kpt]
 
         yw[:,3] = [sum(yw[iw,:3]) for iw in range(nw)]
 
