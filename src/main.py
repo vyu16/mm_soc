@@ -29,6 +29,7 @@ for i_dir in ["x","y","z"]:
 
         mommat = read_elsi_to_den(filename)
 
+        # [[org-org], [org-inorg], [inorg-inorg]]
         de = [[],[],[]]
         m2 = [[],[],[]]
         w = w0-dw
@@ -40,12 +41,15 @@ for i_dir in ["x","y","z"]:
                 if tmp < w1+wid*10:
                     mm = abs(mommat[i1,i2])
 
+                    # org-org
                     if state_is_org[i_kpt,i1] and state_is_org[i_kpt,i2]:
                         de[0].append(tmp)
                         m2[0].append((mm/tmp)**2)
+                    # org-inorg
                     elif state_is_org[i_kpt,i1] or state_is_org[i_kpt,i2]:
                         de[1].append(tmp)
                         m2[1].append((mm/tmp)**2)
+                    # inorg-inorg
                     else:
                         de[2].append(tmp)
                         m2[2].append((mm/tmp)**2)

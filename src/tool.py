@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Parse FHI-aims output to find a few numbers
 def find_dim():
     dim_dict = {}
 
@@ -24,6 +25,7 @@ def find_dim():
 
     return dim_dict
 
+# Gaussian (omitting norm as it doesn't matter)
 def gauss(x,mu,sigma):
 #    pre = 1.0/(sigma*np.sqrt(2*np.pi))
     tmp = (x-mu)/sigma
@@ -31,6 +33,7 @@ def gauss(x,mu,sigma):
 
     return np.exp(tmp)
 
+# Save and plot data
 def save_and_plot(i_dir,x,y):
     with open("decomp_"+i_dir+".dat","w") as f:
         for i in range(len(x)):

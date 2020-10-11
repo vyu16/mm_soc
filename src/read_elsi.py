@@ -1,6 +1,7 @@
 import struct
 import numpy as np
 
+# Read ELSI binary matrix, convert to dense array
 def read_elsi_to_den(filename):
     mat = open(filename,"rb")
     data = mat.read()
